@@ -1,26 +1,27 @@
 import os
 import numpy as np
+import datetime
 from tensorflow import keras
 from tensorflow.keras.preprocessing import image
-from cnn.FreightFrenzyCNN import UltimateGoalCNN
+from FreightFrenzyCNN import EpicCNN
 
-batch_size = 16
-epochs = 7
+batch_size = 32
+epochs = 5
 
-rel_img_path = 'C:/Users/Robotics3/PycharmProjects/pythonProject/dataset/raw_split'
-num_train_images = 295
-num_test_images = 30
+rel_img_path = 'C:/Users/Robotics3/PycharmProjects/FreightFrenzyCV/dataset/split'
+num_train_images = 7866
+num_test_images = 600
 
 # train_data = np.empty((num_train_images, 3264, 2448, 3), dtype='uint8')
-train_data = np.empty((num_train_images, 2448, 2448, 3), dtype='uint8')
+train_data = np.empty((num_train_images, 360, 640, 3), dtype='uint8')
 train_labels = np.array([], dtype='uint8')
 
 # test_data = np.empty((num_test_images, 3264, 2448, 3), dtype='uint8')
-test_data = np.empty((num_test_images, 2448, 2448, 3), dtype='uint8')
+test_data = np.empty((num_test_images, 360, 640, 3), dtype='uint8')
 test_labels = np.array([], dtype='uint8')
 
 # load images
-labels = ['a', 'b', 'c']  # using this list guarantees that the images will be loaded in a consistent order since os.listdir() lists an arbitrary order
+labels = ['center', 'left', 'right']  # using this list guarantees that the images will be loaded in a consistent order since os.listdir() lists an arbitrary order
 lbl_count = 0
 img_count = 0
 print('Loading training images...')
@@ -31,7 +32,7 @@ for label in labels:
         img = image.load_img(os.path.join(temp, file))
         img = np.asarray(img)
         # remove later
-        img = img[408:2856]
+        # img = img[408:2856]
         train_data[img_count] = img
         train_labels = np.append(train_labels, lbl_count)
         img_count += 1
@@ -48,7 +49,7 @@ for label in labels:
         img = image.load_img(os.path.join(temp, file))
         img = np.asarray(img)
         # remove later
-        img = img[408:2856]
+        # img = img[408:2856]
         test_data[img_count] = img
         test_labels = np.append(test_labels, lbl_count)
         img_count += 1
@@ -70,9 +71,13 @@ y_test = keras.utils.to_categorical(y_test, num_classes=3)
 print("Loaded all data.")
 
 # training
-model = UltimateGoalCNN(x_train.shape[1:]).model
+model = EpicCNN(x_train.shape[1:]).model
 loss_fn = keras.losses.CategoricalCrossentropy()
 optimizer = keras.optimizers.Adam()
+
+# tensorboard setup
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, update_freq='batch')
 
 model.summary()
 
@@ -83,9 +88,9 @@ if chk.lower() != 'y':
 
 model.compile(optimizer, loss_fn, metrics=['accuracy'])  # compile the model with its optimizer and loss functions (metrics are displayed during training)
 
-model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)  # train the model
+model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1, callbacks=[tensorboard_callback], validation_split=0.05)  # train the model
 
-model.save('C:/Users/Robotics3/PycharmProjects/pythonProject/saved_models/v1.1', include_optimizer=True, overwrite=True)  # save the entire model (arch., weights, etc.)
+model.save('C:/Users/Robotics3/PycharmProjects/FreightFrenzyCV/cnn/saved_models/v1.0', include_optimizer=True, overwrite=True)  # save the entire model (arch., weights, etc.)
 
 # evaluation
 scores = model.evaluate(x_test, y_test, verbose=0)
