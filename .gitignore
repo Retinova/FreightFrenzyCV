@@ -116,3 +116,4 @@ dmypy.json
 # Images and videos
 .png
 .mp4
+/cnn/logs/
