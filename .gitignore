@@ -117,3 +117,5 @@ dmypy.json
 .png
 .mp4
 /cnn/logs/
+/cnn/saved_models/
+/frozen_models/
