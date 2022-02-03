@@ -1,3 +1,4 @@
+# import keras.models
 from tensorflow.keras.models import Sequential
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
@@ -21,6 +22,7 @@ class EpicCNN:
         # self.model.add(preprocessing.RandomTranslation(height_factor=0.2, width_factor=0.1, fill_mode='nearest', name='translation_aug'))  # randomly translates images
 
         # actual learning layers
+        # TODO: Do training with ReLU, GELU, Softplus, Swish-1, ELU, LReLU
         self.model.add(layers.Conv2D(filters=16, kernel_size=3, strides=2, padding='same', data_format='channels_last', activation='relu'))
         self.model.add(layers.Dropout(rate=0.1))
 
@@ -38,6 +40,6 @@ class EpicCNN:
 
 
 # os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'  # for fixing plot model
-# test = EpicCNN((480, 270, 3))
-# test.model.summary()
-# utils.plot_model(test.model, 'v1_no_preproc.png', True, dpi=192)
+# test = keras.models.load_model(os.getcwd() + '/saved_models/v1.0')
+# test.summary()
+# utils.plot_model(test, 'v1.png', True, dpi=1000)

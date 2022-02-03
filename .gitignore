@@ -119,3 +119,4 @@ dmypy.json
 /cnn/logs/
 /cnn/saved_models/
 /frozen_models/
+/dataset/
